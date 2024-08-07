@@ -124,9 +124,8 @@ class VCL(nn.Module):
             self.prior_means[layer_name] = layer.weight.clone()
             self.prior_logvars[layer_name] = self.log_vars[layer_name].clone()
 
-def VCL_Train(model, optimizer, criterion, scenario1, scenario2, Lambda, epoch):
+def VCL_Train(model, BS, optimizer, criterion, scenario1, scenario2, Lambda, epoch):
    model.train()
-   BS = 64
    for task_id, taskset in enumerate(scenario1):
       trainLoader = DataLoader(deepcopy(taskset), batch_size=BS, shuffle=True, num_workers=2)
       for E in range(epoch):
@@ -161,7 +160,7 @@ for i in range(10):
     model = model.to(device)
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(model.parameters(), lr=0.0001)
-    A.append( VCL_Train(model, optimizer, criterion, scenario1, scenario2, Lambda = 120, epoch = 10) )
+    A.append(VCL_Train(model, BS=16, optimizer, criterion, scenario1, scenario2, Lambda=120, epoch=50))
     print(f"Round: {i}, A: {A[i]}")
 
 A = np.array(A)
